@@ -2,4 +2,4 @@ streamlit
 yfinance
 pandas
 pykrx
-setuptools
+setuptools==75.8.0
