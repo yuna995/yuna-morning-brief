@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="yuna의 모닝브리프", layout="wide")
 
 TICKERS = {
-    "Dow": "^DJI",
+    "^DJI": "Dow",
     "Nasdaq": "^IXIC",
     "S&P500": "^GSPC",
     "VIX": "^VIX",
