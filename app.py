@@ -2,6 +2,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
+from pykrx import stock
 
 st.set_page_config(page_title="yuna의 모닝브리프", layout="wide")
 
@@ -17,20 +18,25 @@ TICKERS = {
     "Gold": "GC=F",
 }
 
+@st.cache_data(ttl=1800)
 def get_snapshot(ticker):
-    hist = yf.Ticker(ticker).history(period="5d")
+    try:
+        hist = yf.Ticker(ticker).history(period="5d")
 
-    if len(hist) < 2:
+        if hist.empty or len(hist) < 2:
+            return None, None, None
+
+        close = float(hist["Close"].iloc[-1])
+        prev = float(hist["Close"].iloc[-2])
+        change = close - prev
+        pct = (change / prev) * 100
+
+        return close, change, pct
+
+    except Exception:
         return None, None, None
 
-    close = float(hist["Close"].iloc[-1])
-    prev = float(hist["Close"].iloc[-2])
-    change = close - prev
-    pct = (change / prev) * 100
 
-    return close, change, pct
-    
-    
 @st.cache_data(ttl=1800)
 def get_etf_flow():
     etf_list = []
@@ -38,13 +44,16 @@ def get_etf_flow():
 
     for i in range(1, 11):
         temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
+
         try:
             temp_list = stock.get_etf_ticker_list(temp_date)
+
             if len(temp_list) > 0:
                 etf_list = temp_list
                 date = temp_date
                 break
-        except:
+
+        except Exception:
             continue
 
     if not etf_list:
@@ -52,7 +61,7 @@ def get_etf_flow():
 
     rows = []
 
-    for ticker in etf_list:   # 🔥 이거 함수 안으로 들어와야 함
+    for ticker in etf_list:
         try:
             name = stock.get_etf_ticker_name(ticker)
             df = stock.get_market_trading_value_by_date(date, date, ticker)
@@ -69,12 +78,14 @@ def get_etf_flow():
                 "기관": round(row.get("기관합계", 0) / 100000000, 1),
             })
 
-        except:
+        except Exception:
             continue
 
     return pd.DataFrame(rows), date
 
+
 st.title("🌅 yuna의 모닝브리프")
+
 st.subheader("📊 ETF 수급")
 
 etf_df, etf_date = get_etf_flow()
@@ -122,10 +133,13 @@ else:
     st.warning("ETF 수급 데이터를 불러오지 못했습니다.")
 
 st.divider()
+
+cols = st.columns(3)
 market_data = {}
 
 for i, (name, ticker) in enumerate(TICKERS.items()):
     close, change, pct = get_snapshot(ticker)
+
     market_data[name] = {
         "close": close,
         "change": change,
@@ -174,12 +188,6 @@ for line in comment:
     st.write(f"- {line}")
 
 st.divider()
-
-st.subheader("📊 ETF 수급")
-st.components.v1.iframe(
-    "https://finance.naver.com/sise/etf.naver",
-    height=400
-)
 
 st.subheader("🌍 미국 시장맵")
 st.components.v1.html("""
