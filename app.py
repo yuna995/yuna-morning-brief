@@ -36,21 +36,21 @@ def get_etf_flow():
     etf_list = []
     date = None
 
-for i in range(1, 11):
-    temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
-    try:
-        temp_list = stock.get_etf_ticker_list(temp_date)
-        if len(temp_list) > 0:
-            etf_list = temp_list
-            date = temp_date
-            break
-    except:
-        continue
+    for i in range(1, 11):
+        temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
+        try:
+           temp_list = stock.get_etf_ticker_list(temp_date)
+           if len(temp_list) > 0:
+               etf_list = temp_list
+               date = temp_date
+               break
+        except:
+            continue
 
-if not etf_list:
-    return pd.DataFrame(), "데이터 없음"
+    if not etf_list:
+        return pd.DataFrame(), "데이터 없음"
     
-rows = []
+    rows = []
 
 for ticker in etf_list:
     try:
