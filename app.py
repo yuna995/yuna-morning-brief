@@ -33,8 +33,8 @@ def get_snapshot(ticker):
     
 @st.cache_data(ttl=1800)
 def get_etf_flow():
-   etf_list = []
-date = None
+    etf_list = []
+    date = None
 
 for i in range(1, 11):
     temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
@@ -49,17 +49,17 @@ for i in range(1, 11):
 
 if not etf_list:
     return pd.DataFrame(), "데이터 없음"
+    
 rows = []
 
-    for ticker in etf_list:
-        try:
-            name = stock.get_etf_ticker_name(ticker)
-            df = stock.get_market_trading_value_by_date(date, date, ticker)
+for ticker in etf_list:
+    try:
+        name = stock.get_etf_ticker_name(ticker)
+        df = stock.get_market_trading_value_by_date(date, date, ticker)
             
             if df.empty:
                 continue
 
-           
             row = df.iloc[-1]
 
             rows.append({
