@@ -1,9 +1,7 @@
 import streamlit as st
 import yfinance as yf
-from datetime import datetime, timedelta
-
 import pandas as pd
-from pykrx import stock
+from datetime import datetime, timedelta
 
 st.set_page_config(page_title="yuna의 모닝브리프", layout="wide")
 
@@ -51,7 +49,7 @@ for i in range(1, 11):
 
 if not etf_list:
     return pd.DataFrame(), "데이터 없음"
-    rows = []
+rows = []
 
     for ticker in etf_list:
         try:
