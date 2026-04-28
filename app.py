@@ -5,16 +5,14 @@ from datetime import datetime, timedelta
 
 st.set_page_config(page_title="yuna의 모닝브리프", layout="wide")
 
-TICKERS = {
-    "^DJI": "Dow",
-    "Nasdaq": "^IXIC",
-    "S&P500": "^GSPC",
-    "VIX": "^VIX",
-    "미국채10Y": "^TNX",
-    "달러인덱스": "DX-Y.NYB",
-    "원/달러": "KRW=X",
-    "WTI": "CL=F",
-    "Gold": "GC=F",
+tickers = {
+    "^IXIC": "Nasdaq",
+    "^GSPC": "S&P500",
+    "^VIX": "VIX",
+    "^TNX": "미국채10Y",
+    "DX-Y.NYB": "달러인덱스",
+    "CL=F": "WTI",
+    "GC=F": "Gold"
 }
 
 @st.cache_data(ttl=1800)
