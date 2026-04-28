@@ -1,6 +1,6 @@
 import streamlit as st
 import yfinance as yf
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 from pykrx import stock
@@ -36,7 +36,7 @@ def get_snapshot(ticker):
 @st.cache_data(ttl=1800)
 def get_etf_flow():
     today = datetime.now().strftime("%Y%m%d")
-    date = stock.get_nearest_business_day_in_a_week(today, prev=True)
+    date = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
 
     etf_list = stock.get_etf_ticker_list(date)
 
