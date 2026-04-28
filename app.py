@@ -38,34 +38,28 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     value = "125억"
-    delta = "+125억"
-
+   
     st.metric(
         "개인 순매수 1위",
         "KODEX 200",
         value,
-        delta=delta,
     )
 with col2:
     value = "87억"
-    delta = "+87억"
-
+   
     st.metric(
         "외국인 순매수 1위",
         "TIGER 미국S&P500",
         value,
-        delta=delta,
     )
 
 with col3:
     value = "64억"
-    delta = "+64억"
-
+    
     st.metric(
         "기관 순매수 1위",
         "KODEX 레버리지",
         value,
-        delta=delta,
     )
 st.caption(f"업데이트: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 st.divider()
