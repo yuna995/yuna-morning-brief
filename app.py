@@ -36,7 +36,7 @@ def get_snapshot(ticker):
 @st.cache_data(ttl=1800)
 def get_etf_flow():
     today = datetime.now().strftime("%Y%m%d")
-    date = stock.get_nearest_business_day_in_a_week(today)
+    date = stock.get_nearest_business_day_in_a_week(today, prev=True)
 
     etf_list = stock.get_etf_ticker_list(date)
 
@@ -46,10 +46,11 @@ def get_etf_flow():
         try:
             name = stock.get_etf_ticker_name(ticker)
             df = stock.get_market_trading_value_by_date(date, date, ticker)
-
+            
             if df.empty:
                 continue
 
+           
             row = df.iloc[-1]
 
             rows.append({
