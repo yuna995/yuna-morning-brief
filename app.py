@@ -35,11 +35,22 @@ def get_snapshot(ticker):
     
 @st.cache_data(ttl=1800)
 def get_etf_flow():
-    today = datetime.now().strftime("%Y%m%d")
-    date = (datetime.now() - timedelta(days=1)).strftime("%Y%m%d")
+   etf_list = []
+date = None
 
-    etf_list = stock.get_etf_ticker_list(date)
+for i in range(1, 11):
+    temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
+    try:
+        temp_list = stock.get_etf_ticker_list(temp_date)
+        if len(temp_list) > 0:
+            etf_list = temp_list
+            date = temp_date
+            break
+    except:
+        continue
 
+if not etf_list:
+    return pd.DataFrame(), "데이터 없음"
     rows = []
 
     for ticker in etf_list:
