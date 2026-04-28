@@ -39,38 +39,38 @@ def get_etf_flow():
     for i in range(1, 11):
         temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
         try:
-           temp_list = stock.get_etf_ticker_list(temp_date)
-           if len(temp_list) > 0:
-               etf_list = temp_list
-               date = temp_date
-               break
+            temp_list = stock.get_etf_ticker_list(temp_date)
+            if len(temp_list) > 0:
+                etf_list = temp_list
+                date = temp_date
+                break
         except:
             continue
 
     if not etf_list:
         return pd.DataFrame(), "데이터 없음"
-    
+
     rows = []
 
-for ticker in etf_list:
-    try:
-        name = stock.get_etf_ticker_name(ticker)
-        df = stock.get_market_trading_value_by_date(date, date, ticker)
+    for ticker in etf_list:   # 🔥 이거 함수 안으로 들어와야 함
+        try:
+            name = stock.get_etf_ticker_name(ticker)
+            df = stock.get_market_trading_value_by_date(date, date, ticker)
 
-        if df.empty:
+            if df.empty:
+                continue
+
+            row = df.iloc[-1]
+
+            rows.append({
+                "ETF명": name,
+                "개인": round(row.get("개인", 0) / 100000000, 1),
+                "외국인": round(row.get("외국인합계", 0) / 100000000, 1),
+                "기관": round(row.get("기관합계", 0) / 100000000, 1),
+            })
+
+        except:
             continue
-
-        row = df.iloc[-1]
-
-        rows.append({
-            "ETF명": name,
-            "개인": round(row.get("개인", 0) / 100000000, 1),
-            "외국인": round(row.get("외국인합계", 0) / 100000000, 1),
-            "기관": round(row.get("기관합계", 0) / 100000000, 1),
-        })
-
-    except:
-        continue
 
     return pd.DataFrame(rows), date
 
