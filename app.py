@@ -31,6 +31,7 @@ def get_snapshot(ticker):
     pct = (change / prev) * 100
 
     return close, change, pct
+    
     @st.cache_data(ttl=1800)
 def get_etf_flow():
     today = datetime.now().strftime("%Y%m%d")
