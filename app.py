@@ -42,7 +42,7 @@ def get_etf_flow():
     etf_list = []
     date = None
 
-    for i in range(1, 11):
+    for i in range(1, 60):
         temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
 
         try:
@@ -130,7 +130,7 @@ if not etf_df.empty:
     )
 
 else:
-    st.warning("ETF 수급 데이터를 불러오지 못했습니다.")
+    st.warning(f"ETF 수급 데이터를 불러오지 못했습니다. 기준일: {etf_date}")
 
 st.divider()
 
