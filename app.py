@@ -5,14 +5,14 @@ from datetime import datetime, timedelta
 
 st.set_page_config(page_title="yuna의 모닝브리프", layout="wide")
 
-tickers = {
-    "^IXIC": "Nasdaq",
-    "^GSPC": "S&P500",
-    "^VIX": "VIX",
-    "^TNX": "미국채10Y",
-    "DX-Y.NYB": "달러인덱스",
-    "CL=F": "WTI",
-    "GC=F": "Gold"
+TICKERS = {
+    "Nasdaq": "^IXIC",
+    "S&P500": "^GSPC",
+    "VIX": "^VIX",
+    "미국채10Y": "^TNX",
+    "달러인덱스": "DX-Y.NYB",
+    "WTI": "CL=F",
+    "Gold": "GC=F"
 }
 
 @st.cache_data(ttl=1800)
@@ -39,32 +39,18 @@ def get_etf_flow():
     etf_list = []
     date = None
 
-    for i in range(1, 60):
-        temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
+    for i in range(1, 11):
+    temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
+    try:
+        temp_list = stock.get_etf_ticker_list(temp_date)
 
-        try:
-            temp_list = stock.get_etf_ticker_list(temp_date)
+        if len(temp_list) > 0:
+            etf_list = temp_list
+            date = temp_date
+            break
 
-            if len(temp_list) > 0:
-                etf_list = temp_list
-                date = temp_date
-                break
-
-        except Exception:
-            continue
-
-    if not etf_list:
-        return pd.DataFrame(), "데이터 없음"
-
-    rows = []
-
-    for ticker in etf_list:
-        try:
-            name = stock.get_etf_ticker_name(ticker)
-            df = stock.get_market_trading_value_by_date(date, date, ticker)
-
-            if df.empty:
-                continue
+    except Exception:
+        continue
 
             row = df.iloc[-1]
 
@@ -79,7 +65,6 @@ def get_etf_flow():
             continue
 
     return pd.DataFrame(rows), date
-
 
 st.title("🌅 yuna의 모닝브리프")
 
