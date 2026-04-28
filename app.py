@@ -2,6 +2,9 @@ import streamlit as st
 import yfinance as yf
 from datetime import datetime
 
+import pandas as pd
+from pykrx import stock
+
 st.set_page_config(page_title="yuna의 모닝브리프", layout="wide")
 
 TICKERS = {
@@ -28,43 +31,85 @@ def get_snapshot(ticker):
     pct = (change / prev) * 100
 
     return close, change, pct
+    @st.cache_data(ttl=1800)
+def get_etf_flow():
+    today = datetime.now().strftime("%Y%m%d")
+    date = stock.get_nearest_business_day_in_a_week(today)
+
+    etf_list = stock.get_etf_ticker_list(date)
+
+    rows = []
+
+    for ticker in etf_list:
+        try:
+            name = stock.get_etf_ticker_name(ticker)
+            df = stock.get_market_trading_value_by_date(date, date, ticker)
+
+            if df.empty:
+                continue
+
+            row = df.iloc[-1]
+
+            rows.append({
+                "ETF명": name,
+                "개인": round(row.get("개인", 0) / 100000000, 1),
+                "외국인": round(row.get("외국인합계", 0) / 100000000, 1),
+                "기관": round(row.get("기관합계", 0) / 100000000, 1),
+            })
+
+        except:
+            continue
+
+    return pd.DataFrame(rows), date
 
 st.title("🌅 yuna의 모닝브리프")
 st.subheader("📊 ETF 수급")
 
-st.info("오늘 ETF 수급은 개인 중심 순매수 흐름입니다.")
+etf_df, etf_date = get_etf_flow()
 
-col1, col2, col3 = st.columns(3)
+if not etf_df.empty:
+    personal_top = etf_df.sort_values("개인", ascending=False).iloc[0]
+    foreign_top = etf_df.sort_values("외국인", ascending=False).iloc[0]
+    inst_top = etf_df.sort_values("기관", ascending=False).iloc[0]
 
-with col1:
-    value = "125억"
-   
-    st.metric(
-        "개인 순매수 1위",
-        "KODEX 200",
-        value,
-    )
-with col2:
-    value = "87억"
-   
-    st.metric(
-        "외국인 순매수 1위",
-        "TIGER 미국S&P500",
-        value,
+    st.info("ETF 수급 데이터를 자동으로 불러왔습니다.")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            "개인 순매수 1위",
+            personal_top["ETF명"],
+            f'{personal_top["개인"]:.1f}억'
+        )
+
+    with col2:
+        st.metric(
+            "외국인 순매수 1위",
+            foreign_top["ETF명"],
+            f'{foreign_top["외국인"]:.1f}억'
+        )
+
+    with col3:
+        st.metric(
+            "기관 순매수 1위",
+            inst_top["ETF명"],
+            f'{inst_top["기관"]:.1f}억'
+        )
+
+    st.caption(f"ETF 기준일: {etf_date} / 업데이트: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    st.markdown("#### 개인 순매수 TOP 5")
+    st.dataframe(
+        etf_df.sort_values("개인", ascending=False).head(5),
+        use_container_width=True,
+        hide_index=True
     )
 
-with col3:
-    value = "64억"
-    
-    st.metric(
-        "기관 순매수 1위",
-        "KODEX 레버리지",
-        value,
-    )
-st.caption(f"업데이트: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+else:
+    st.warning("ETF 수급 데이터를 불러오지 못했습니다.")
+
 st.divider()
-cols = st.columns(3)
-
 market_data = {}
 
 for i, (name, ticker) in enumerate(TICKERS.items()):
