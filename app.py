@@ -45,7 +45,6 @@ with col1:
         "KODEX 200",
         value,
         delta=delta,
-        delta_color="normal"
     )
 with col2:
     value = "87억"
@@ -56,7 +55,6 @@ with col2:
         "TIGER 미국S&P500",
         value,
         delta=delta,
-       delta_color="normal"
     )
 
 with col3:
@@ -68,7 +66,6 @@ with col3:
         "KODEX 레버리지",
         value,
         delta=delta,
-        delta_color="normal"
     )
 st.caption(f"업데이트: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 st.divider()
