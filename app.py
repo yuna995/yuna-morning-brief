@@ -56,21 +56,21 @@ for ticker in etf_list:
     try:
         name = stock.get_etf_ticker_name(ticker)
         df = stock.get_market_trading_value_by_date(date, date, ticker)
-            
-            if df.empty:
-                continue
 
-            row = df.iloc[-1]
-
-            rows.append({
-                "ETF명": name,
-                "개인": round(row.get("개인", 0) / 100000000, 1),
-                "외국인": round(row.get("외국인합계", 0) / 100000000, 1),
-                "기관": round(row.get("기관합계", 0) / 100000000, 1),
-            })
-
-        except:
+        if df.empty:
             continue
+
+        row = df.iloc[-1]
+
+        rows.append({
+            "ETF명": name,
+            "개인": round(row.get("개인", 0) / 100000000, 1),
+            "외국인": round(row.get("외국인합계", 0) / 100000000, 1),
+            "기관": round(row.get("기관합계", 0) / 100000000, 1),
+        })
+
+    except:
+        continue
 
     return pd.DataFrame(rows), date
 
