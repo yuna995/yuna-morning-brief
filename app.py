@@ -32,7 +32,8 @@ def get_snapshot(ticker):
 
     return close, change, pct
     
-    @st.cache_data(ttl=1800)
+    
+@st.cache_data(ttl=1800)
 def get_etf_flow():
     today = datetime.now().strftime("%Y%m%d")
     date = stock.get_nearest_business_day_in_a_week(today)
