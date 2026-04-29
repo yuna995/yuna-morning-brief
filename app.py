@@ -89,6 +89,9 @@ def get_korea_market():
 
 st.title("🌅 이유나 PB의 모닝브리프")
 
+today_text = datetime.now().strftime("%Y년 %m월 %d일")
+st.caption(f"📅 {today_text} 오늘의 모닝브리프")
+
 st.divider()
 
 cols = st.columns(3)
