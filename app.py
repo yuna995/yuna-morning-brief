@@ -5,7 +5,7 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 
-st.set_page_config(page_title="yuna의 모닝브리프", layout="wide")
+st.set_page_config(page_title="이유나PB의 모닝브리프", layout="wide")
 
 TICKERS = {
     "Nasdaq": "^IXIC",
@@ -87,7 +87,7 @@ def get_korea_market():
 
 # ---------------- UI ----------------
 
-st.title("🌅 yuna의 모닝브리프")
+st.title("🌅 이유나 PB 모닝브리프")
 
 st.divider()
 
