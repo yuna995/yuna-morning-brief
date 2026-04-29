@@ -14,7 +14,8 @@ TICKERS = {
     "미국채10Y": "^TNX",
     "달러인덱스": "DX-Y.NYB",
     "WTI": "CL=F",
-    "Gold": "GC=F"
+    "Gold": "GC=F",
+    "원달러": "KRW=X",
 }
 
 @st.cache_data(ttl=1800)
