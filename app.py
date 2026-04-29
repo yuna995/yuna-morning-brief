@@ -186,31 +186,6 @@ st.components.v1.html("""
 </div>
 """, height=520)
 
-st.subheader("🇰🇷 한국 시장맵")
-st.components.v1.html("""
-<div class="tradingview-widget-container">
-  <div id="tradingview_korea_heatmap"></div>
-  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js">
-  {
-    "exchanges": [],
-    "dataSource": "KOSPI",
-    "grouping": "sector",
-    "blockSize": "market_cap_basic",
-    "blockColor": "change",
-    "locale": "kr",
-    "symbolUrl": "",
-    "colorTheme": "dark",
-    "hasTopBar": false,
-    "isDataSetEnabled": false,
-    "isZoomEnabled": true,
-    "hasSymbolTooltip": true,
-    "width": "100%",
-    "height": "500"
-  }
-  </script>
-</div>
-""", height=520)
-
 st.subheader("📅 이번 주 주요 일정")
 st.components.v1.iframe(
     "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone,timeselector,filters&countries=5&calType=week&timeZone=54&lang=18",
