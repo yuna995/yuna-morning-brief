@@ -2,7 +2,6 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
-from pykrx import stock
 
 st.set_page_config(page_title="yuna의 모닝브리프", layout="wide")
 
@@ -52,104 +51,11 @@ def get_korea_market():
 
     except:
         return {}
-    try:
-        today = datetime.now().strftime("%Y%m%d")
-        prev = (datetime.now() - timedelta(days=7)).strftime("%Y%m%d")
-
-        kospi = stock.get_index_ohlcv_by_date(prev, today, "1001")
-        kosdaq = stock.get_index_ohlcv_by_date(prev, today, "2001")
-
-        if kospi.empty or kosdaq.empty or len(kospi) < 2 or len(kosdaq) < 2:
-            return {}
-
-        kospi_close = float(kospi["종가"].iloc[-1])
-        kospi_prev = float(kospi["종가"].iloc[-2])
-
-        kosdaq_close = float(kosdaq["종가"].iloc[-1])
-        kosdaq_prev = float(kosdaq["종가"].iloc[-2])
-
-        return {
-            "KOSPI": (kospi_close, kospi_close - kospi_prev),
-            "KOSDAQ": (kosdaq_close, kosdaq_close - kosdaq_prev)
-        }
-
-    except Exception:
-        return {}
-
-        close = float(hist["Close"].iloc[-1])
-        prev = float(hist["Close"].iloc[-2])
-        change = close - prev
-        pct = (change / prev) * 100
-
-        return close, change, pct
-
-    except Exception:
-        return None, None, None
 
 
-@st.cache_data(ttl=1800)
-def get_snapshot(ticker):
-    try:
-        hist = yf.Ticker(ticker).history(period="5d")
+# ---------------- UI ----------------
 
-        if hist.empty or len(hist) < 2:
-            return None, None, None
-
-        close = float(hist["Close"].iloc[-1])
-        prev = float(hist["Close"].iloc[-2])
-        change = close - prev
-        pct = (change / prev) * 100
-
-        return close, change, pct
-
-    except:
-        return None, None, None
-
-
-@st.cache_data(ttl=1800)
-def get_korea_market():
-    try:
-        end = datetime.now()
-        start = end - timedelta(days=10)
-
-        kospi = fdr.DataReader("KS11", start, end)
-        kosdaq = fdr.DataReader("KQ11", start, end)
-
-        if kospi.empty or kosdaq.empty or len(kospi) < 2 or len(kosdaq) < 2:
-            return {}
-
-        kospi_close = float(kospi["Close"].iloc[-1])
-        kospi_prev = float(kospi["Close"].iloc[-2])
-
-        kosdaq_close = float(kosdaq["Close"].iloc[-1])
-        kosdaq_prev = float(kosdaq["Close"].iloc[-2])
-
-        return {
-            "KOSPI": (kospi_close, kospi_close - kospi_prev),
-            "KOSDAQ": (kosdaq_close, kosdaq_close - kosdaq_prev)
-        }
-
-    except:
-        return {}
-       
 st.title("🌅 yuna의 모닝브리프")
-
-st.subheader("📊 ETF 수급")
-
-st.info("ETF 수급 데이터는 장중 변동이 커서 수동 업데이트 기준으로 표시합니다.")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.metric("개인 순매수 1위", "KODEX 200", "125억")
-
-with col2:
-    st.metric("외국인 순매수 1위", "TIGER 미국S&P500", "87억")
-
-with col3:
-    st.metric("기관 순매수 1위", "KODEX 레버리지", "64억")
-
-st.caption(f"업데이트: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 st.divider()
 
@@ -157,10 +63,7 @@ cols = st.columns(3)
 market_data = {}
 
 for i, (name, ticker) in enumerate(TICKERS.items()):
-    try:
-        close, change, pct = get_snapshot(ticker)
-    except:
-        close, change, pct = None, None, None
+    close, change, pct = get_snapshot(ticker)
 
     market_data[name] = {
         "close": close,
@@ -176,7 +79,6 @@ for i, (name, ticker) in enumerate(TICKERS.items()):
             value=f"{close:,.2f}",
             delta=f"{change:,.2f} ({pct:.2f}%)"
         )
-       
 
 st.divider()
 st.subheader("KR 한국 시장")
