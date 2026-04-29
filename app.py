@@ -109,20 +109,20 @@ def get_snapshot(ticker):
 @st.cache_data(ttl=1800)
 def get_korea_market():
     try:
-        today = datetime.now().strftime("%Y%m%d")
-        prev = (datetime.now() - timedelta(days=7)).strftime("%Y%m%d")
+        end = datetime.now()
+        start = end - timedelta(days=10)
 
-        kospi = stock.get_index_ohlcv_by_date(prev, today, "1001")
-        kosdaq = stock.get_index_ohlcv_by_date(prev, today, "2001")
+        kospi = fdr.DataReader("KS11", start, end)
+        kosdaq = fdr.DataReader("KQ11", start, end)
 
         if kospi.empty or kosdaq.empty or len(kospi) < 2 or len(kosdaq) < 2:
             return {}
 
-        kospi_close = float(kospi["종가"].iloc[-1])
-        kospi_prev = float(kospi["종가"].iloc[-2])
+        kospi_close = float(kospi["Close"].iloc[-1])
+        kospi_prev = float(kospi["Close"].iloc[-2])
 
-        kosdaq_close = float(kosdaq["종가"].iloc[-1])
-        kosdaq_prev = float(kosdaq["종가"].iloc[-2])
+        kosdaq_close = float(kosdaq["Close"].iloc[-1])
+        kosdaq_prev = float(kosdaq["Close"].iloc[-2])
 
         return {
             "KOSPI": (kospi_close, kospi_close - kospi_prev),
