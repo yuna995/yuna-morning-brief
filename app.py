@@ -38,21 +38,16 @@ def get_snapshot(ticker):
 @st.cache_data(ttl=1800)
 def get_korea_market():
     try:
-        kospi = yf.Ticker("^KS11").history(period="5d")
-        kosdaq = yf.Ticker("^KQ11").history(period="5d")
+        kospi = yf.Ticker("EWY").history(period="5d")
 
-        if kospi.empty or kosdaq.empty:
+        if kospi.empty or len(kospi) < 2:
             return {}
 
-        kospi_close = kospi["Close"].iloc[-1]
-        kospi_prev = kospi["Close"].iloc[-2]
-
-        kosdaq_close = kosdaq["Close"].iloc[-1]
-        kosdaq_prev = kosdaq["Close"].iloc[-2]
+        close = float(kospi["Close"].iloc[-1])
+        prev = float(kospi["Close"].iloc[-2])
 
         return {
-            "KOSPI": (kospi_close, kospi_close - kospi_prev),
-            "KOSDAQ": (kosdaq_close, kosdaq_close - kosdaq_prev)
+            "KOSPI(EWY)": (close, close - prev)
         }
 
     except:
