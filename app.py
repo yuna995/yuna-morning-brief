@@ -184,12 +184,12 @@ for i, (name, ticker) in enumerate(TICKERS.items()):
             value=f"{close:,.2f}",
             delta=f"{change:,.2f} ({pct:.2f}%)"
         )
-        # 👉 여기 (for문 끝난 직후, 들여쓰기 없는 상태)
+       
 
 st.divider()
 st.subheader("🇰🇷 한국 시장")
 
-k_cols[i % 2].metric(
+k_cols[i % 2].metric()
 
 k_data = get_korea_market()
 
