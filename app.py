@@ -187,14 +187,13 @@ for i, (name, ticker) in enumerate(TICKERS.items()):
        
 
 st.divider()
-st.subheader("🇰🇷 한국 시장")
+st.subheader("KR 한국 시장")
 
-k_cols[i % 2].metric()
-
+k_cols = st.columns(2)
 k_data = get_korea_market()
 
 for i, (name, (close, change)) in enumerate(k_data.items()):
-    k_cols[i].metric(
+    k_cols[i % 2].metric(
         label=name,
         value=f"{close:,.2f}",
         delta=f"{change:,.2f}"
