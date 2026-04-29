@@ -192,6 +192,9 @@ st.subheader("KR 한국 시장")
 k_cols = st.columns(2)
 k_data = get_korea_market()
 
+if not k_data:
+    st.warning("한국 시장 데이터를 불러오지 못했습니다.")
+
 for i, (name, (close, change)) in enumerate(k_data.items()):
     k_cols[i % 2].metric(
         label=name,
