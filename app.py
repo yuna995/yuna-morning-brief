@@ -120,8 +120,8 @@ for i, (name, ticker) in enumerate(TICKERS.items()):
     else:
         cols[i % 3].metric(
             label=name,
-            value=close,
-            delta=f"{change} ({pct}%)"
+            value=f"{close:,.2f}",
+            delta=f"{change:,.2f} ({pct:.2f}%)"
         )
 
 st.divider()
