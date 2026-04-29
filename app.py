@@ -193,7 +193,7 @@ st.components.v1.html("""
   <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js">
   {
     "exchanges": [],
-    "dataSource": "KRX",
+    "dataSource": "KOSPI",
     "grouping": "sector",
     "blockSize": "market_cap_basic",
     "blockColor": "change",
