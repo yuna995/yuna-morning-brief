@@ -1,4 +1,3 @@
-import FinanceDataReader as fdr
 streamlit
 yfinance
 pandas
