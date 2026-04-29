@@ -186,6 +186,83 @@ st.components.v1.html("""
 </div>
 """, height=520)
 
+st.subheader("🇰🇷 한국 섹터 미니맵")
+
+korea_sectors = {
+    "반도체": {
+        "삼성전자": "005930.KS",
+        "SK하이닉스": "000660.KS",
+        "한미반도체": "042700.KS",
+    },
+    "2차전지": {
+        "LG에너지솔루션": "373220.KS",
+        "삼성SDI": "006400.KS",
+        "에코프로비엠": "247540.KQ",
+    },
+    "자동차": {
+        "현대차": "005380.KS",
+        "기아": "000270.KS",
+        "현대모비스": "012330.KS",
+    },
+    "금융": {
+        "KB금융": "105560.KS",
+        "신한지주": "055550.KS",
+        "하나금융지주": "086790.KS",
+    },
+    "인터넷/게임": {
+        "NAVER": "035420.KS",
+        "카카오": "035720.KS",
+        "크래프톤": "259960.KS",
+    },
+    "바이오": {
+        "삼성바이오로직스": "207940.KS",
+        "셀트리온": "068270.KS",
+        "유한양행": "000100.KS",
+    },
+    "조선/방산": {
+        "HD현대중공업": "329180.KS",
+        "한화오션": "042660.KS",
+        "한화에어로스페이스": "012450.KS",
+    },
+    "화장품/소비재": {
+        "아모레퍼시픽": "090430.KS",
+        "LG생활건강": "051900.KS",
+        "코스맥스": "192820.KS",
+    },
+}
+
+@st.cache_data(ttl=1800)
+def get_stock_pct(ticker):
+    try:
+        hist = yf.Ticker(ticker).history(period="5d")
+        if hist.empty or len(hist) < 2:
+            return None, None
+
+        close = float(hist["Close"].iloc[-1])
+        prev = float(hist["Close"].iloc[-2])
+        pct = ((close - prev) / prev) * 100
+
+        return close, pct
+    except:
+        return None, None
+
+
+for sector, stocks in korea_sectors.items():
+    st.markdown(f"### {sector}")
+    cols = st.columns(3)
+
+    for i, (name, ticker) in enumerate(stocks.items()):
+        close, pct = get_stock_pct(ticker)
+
+        if close is None:
+            cols[i % 3].metric(name, "N/A")
+        else:
+            cols[i % 3].metric(
+                label=name,
+                value=f"{close:,.0f}",
+                delta=f"{pct:.2f}%"
+            )
+
 st.subheader("📅 이번 주 주요 일정")
 st.components.v1.iframe(
     "https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone,timeselector,filters&countries=5&calType=week&timeZone=54&lang=18",
