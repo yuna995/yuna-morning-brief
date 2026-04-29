@@ -1,3 +1,5 @@
+import requests
+import re
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -35,18 +37,47 @@ def get_snapshot(ticker):
 
 
 @st.cache_data(ttl=1800)
+@st.cache_data(ttl=1800)
 def get_korea_market():
-    try:
-        kospi = yf.Ticker("EWY").history(period="5d")
+    def get_naver_index(code):
+        import requests, re
 
-        if kospi.empty or len(kospi) < 2:
+        url = f"https://finance.naver.com/sise/sise_index.naver?code={code}"
+        headers = {"User-Agent": "Mozilla/5.0"}
+
+        html = requests.get(url, headers=headers).text
+
+        value_match = re.search(r'id="now_value">([\d,\.]+)</em>', html)
+        change_match = re.search(r'id="change_value_and_rate">(.*?)</span>', html, re.S)
+
+        if not value_match:
+            return None, None
+
+        value = float(value_match.group(1).replace(",", ""))
+
+        change = 0.0
+        if change_match:
+            text = re.sub("<.*?>", "", change_match.group(1)).strip()
+            nums = re.findall(r"[\d,\.]+", text)
+
+            if nums:
+                change = float(nums[0].replace(",", ""))
+
+            if "하락" in text:
+                change = -change
+
+        return value, change
+
+    try:
+        kospi_close, kospi_change = get_naver_index("KOSPI")
+        kosdaq_close, kosdaq_change = get_naver_index("KOSDAQ")
+
+        if kospi_close is None or kosdaq_close is None:
             return {}
 
-        close = float(kospi["Close"].iloc[-1])
-        prev = float(kospi["Close"].iloc[-2])
-
         return {
-            "KOSPI(EWY)": (close, close - prev)
+            "KOSPI": (kospi_close, kospi_change),
+            "KOSDAQ": (kosdaq_close, kosdaq_change)
         }
 
     except:
