@@ -23,8 +23,43 @@ def get_snapshot(ticker):
 
         if hist.empty or len(hist) < 2:
             return None, None, None
-            @st.cache_data(ttl=1800)
+
+        close = float(hist["Close"].iloc[-1])
+        prev = float(hist["Close"].iloc[-2])
+        change = close - prev
+        pct = (change / prev) * 100
+
+        return close, change, pct
+
+    except:
+        return None, None, None
+
+
+@st.cache_data(ttl=1800)
 def get_korea_market():
+    try:
+        today = datetime.now().strftime("%Y%m%d")
+        prev = (datetime.now() - timedelta(days=7)).strftime("%Y%m%d")
+
+        kospi = stock.get_index_ohlcv_by_date(prev, today, "1001")
+        kosdaq = stock.get_index_ohlcv_by_date(prev, today, "2001")
+
+        if kospi.empty or kosdaq.empty or len(kospi) < 2 or len(kosdaq) < 2:
+            return {}
+
+        kospi_close = float(kospi["종가"].iloc[-1])
+        kospi_prev = float(kospi["종가"].iloc[-2])
+
+        kosdaq_close = float(kosdaq["종가"].iloc[-1])
+        kosdaq_prev = float(kosdaq["종가"].iloc[-2])
+
+        return {
+            "KOSPI": (kospi_close, kospi_close - kospi_prev),
+            "KOSDAQ": (kosdaq_close, kosdaq_close - kosdaq_prev)
+        }
+
+    except:
+        return {}
     try:
         today = datetime.now().strftime("%Y%m%d")
         prev = (datetime.now() - timedelta(days=7)).strftime("%Y%m%d")
@@ -61,50 +96,50 @@ def get_korea_market():
 
 
 @st.cache_data(ttl=1800)
-def get_etf_flow():
-    etf_list = []
-    date = None
+def get_snapshot(ticker):
+    try:
+        hist = yf.Ticker(ticker).history(period="5d")
 
-    for i in range(1, 11):
-        temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
+        if hist.empty or len(hist) < 2:
+            return None, None, None
 
-        try:
-            temp_list = stock.get_etf_ticker_list(temp_date)
+        close = float(hist["Close"].iloc[-1])
+        prev = float(hist["Close"].iloc[-2])
+        change = close - prev
+        pct = (change / prev) * 100
 
-            if len(temp_list) > 0:
-                etf_list = temp_list
-                date = temp_date
-                break
+        return close, change, pct
 
-        except Exception:
-            continue
+    except:
+        return None, None, None
 
-    if not etf_list:
-        return pd.DataFrame(), "데이터 없음"
 
-    rows = []
+@st.cache_data(ttl=1800)
+def get_korea_market():
+    try:
+        today = datetime.now().strftime("%Y%m%d")
+        prev = (datetime.now() - timedelta(days=7)).strftime("%Y%m%d")
 
-    for ticker in etf_list:
-        try:
-            name = stock.get_etf_ticker_name(ticker)
-            df = stock.get_market_trading_value_by_date(date, date, ticker)
+        kospi = stock.get_index_ohlcv_by_date(prev, today, "1001")
+        kosdaq = stock.get_index_ohlcv_by_date(prev, today, "2001")
 
-            if df.empty:
-                continue
+        if kospi.empty or kosdaq.empty or len(kospi) < 2 or len(kosdaq) < 2:
+            return {}
 
-            row = df.iloc[-1]
+        kospi_close = float(kospi["종가"].iloc[-1])
+        kospi_prev = float(kospi["종가"].iloc[-2])
 
-            rows.append({
-                "ETF명": name,
-                "개인": round(row.get("개인", 0) / 100000000, 1),
-                "외국인": round(row.get("외국인합계", 0) / 100000000, 1),
-                "기관": round(row.get("기관합계", 0) / 100000000, 1),
-            })
+        kosdaq_close = float(kosdaq["종가"].iloc[-1])
+        kosdaq_prev = float(kosdaq["종가"].iloc[-2])
 
-        except Exception:
-            continue
+        return {
+            "KOSPI": (kospi_close, kospi_close - kospi_prev),
+            "KOSDAQ": (kosdaq_close, kosdaq_close - kosdaq_prev)
+        }
 
-    return pd.DataFrame(rows), date
+    except:
+        return {}
+       
 st.title("🌅 yuna의 모닝브리프")
 
 st.subheader("📊 ETF 수급")
