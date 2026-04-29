@@ -40,17 +40,31 @@ def get_etf_flow():
     date = None
 
     for i in range(1, 11):
-    temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
-    try:
-        temp_list = stock.get_etf_ticker_list(temp_date)
+        temp_date = (datetime.now() - timedelta(days=i)).strftime("%Y%m%d")
 
-        if len(temp_list) > 0:
-            etf_list = temp_list
-            date = temp_date
-            break
+        try:
+            temp_list = stock.get_etf_ticker_list(temp_date)
 
-    except Exception:
-        continue
+            if len(temp_list) > 0:
+                etf_list = temp_list
+                date = temp_date
+                break
+
+        except Exception:
+            continue
+
+    if not etf_list:
+        return pd.DataFrame(), "데이터 없음"
+
+    rows = []
+
+    for ticker in etf_list:
+        try:
+            name = stock.get_etf_ticker_name(ticker)
+            df = stock.get_market_trading_value_by_date(date, date, ticker)
+
+            if df.empty:
+                continue
 
             row = df.iloc[-1]
 
@@ -65,7 +79,6 @@ def get_etf_flow():
             continue
 
     return pd.DataFrame(rows), date
-
 st.title("🌅 yuna의 모닝브리프")
 
 st.subheader("📊 ETF 수급")
@@ -91,12 +104,15 @@ cols = st.columns(3)
 market_data = {}
 
 for i, (name, ticker) in enumerate(TICKERS.items()):
-    close, change, pct = get_snapshot(ticker)
+    try:
+        close, change, pct = get_snapshot(ticker)
+    except:
+        close, change, pct = None, None, None
 
     market_data[name] = {
         "close": close,
         "change": change,
-        "pct": pct,
+        "pct": pct
     }
 
     if close is None:
@@ -104,8 +120,8 @@ for i, (name, ticker) in enumerate(TICKERS.items()):
     else:
         cols[i % 3].metric(
             label=name,
-            value=f"{close:,.2f}",
-            delta=f"{change:+,.2f} ({pct:+.2f}%)"
+            value=close,
+            delta=f"{change} ({pct}%)"
         )
 
 st.divider()
