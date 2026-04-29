@@ -132,35 +132,33 @@ st.divider()
 
 st.subheader("📝 아침 시황 코멘트")
 
-comment = []
+summary = "📌 "
 
-if market_data["Nasdaq"]["pct"] is not None:
-    if market_data["Nasdaq"]["pct"] > 1:
-        comment.append("나스닥 강세 흐름으로 기술주 투자심리가 양호합니다.")
-    elif market_data["Nasdaq"]["pct"] < -1:
-        comment.append("나스닥 약세로 성장주 변동성 확대에 유의할 필요가 있습니다.")
+nasdaq_pct = market_data.get("Nasdaq", {}).get("pct")
+dxy_pct = market_data.get("달러인덱스", {}).get("pct")
+
+# 나스닥
+if nasdaq_pct is not None:
+    if nasdaq_pct > 1:
+        summary += "기술주 강세"
+    elif nasdaq_pct < -1:
+        summary += "기술주 약세"
     else:
-        comment.append("나스닥은 보합권에 가까운 흐름입니다.")
+        summary += "보합 흐름"
 
-if market_data["VIX"]["close"] is not None:
-    if market_data["VIX"]["close"] >= 20:
-        comment.append("VIX가 높은 수준이라 시장 경계심이 남아 있습니다.")
+# 달러
+if dxy_pct is not None:
+    if dxy_pct > 0:
+        summary += ", 달러 강세 동반"
     else:
-        comment.append("VIX는 비교적 안정적인 수준입니다.")
+        summary += ", 달러 약세"
 
-if market_data["미국채10Y"]["close"] is not None:
-    comment.append(f'미국채 10년물 금리는 {market_data["미국채10Y"]["close"]:.2f}% 수준입니다.')
+# 종합 해석
+if nasdaq_pct is not None and dxy_pct is not None:
+    if nasdaq_pct > 1 and dxy_pct > 0:
+        summary += " (금리/달러 부담에도 주식 강세)"
 
-if market_data["달러인덱스"]["pct"] is not None:
-    if market_data["달러인덱스"]["pct"] > 0:
-        comment.append("달러 강세 흐름이 이어지고 있습니다.")
-    elif market_data["달러인덱스"]["pct"] < 0:
-        comment.append("달러는 소폭 약세 흐름입니다.")
-
-for line in comment:
-    st.write(f"- {line}")
-
-st.divider()
+st.info(summary)
 
 st.subheader("🌍 미국 시장맵")
 st.components.v1.html("""
