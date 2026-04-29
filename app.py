@@ -190,41 +190,6 @@ st.markdown(f"""
 nasdaq_pct = market_data.get("Nasdaq", {}).get("pct")
 dxy_pct = market_data.get("달러인덱스", {}).get("pct")
 
-# 나스닥
-if nasdaq_pct is not None:
-    if nasdaq_pct > 1:
-        summary += "기술주 강세"
-    elif nasdaq_pct < -1:
-        summary += "기술주 약세"
-    else:
-        summary += "보합 흐름"
-
-# 달러
-if dxy_pct is not None:
-    if dxy_pct > 0:
-        summary += ", 달러 강세 동반"
-    else:
-        summary += ", 달러 약세"
-
-# 종합 해석
-if nasdaq_pct is not None and dxy_pct is not None:
-    if nasdaq_pct > 1 and dxy_pct > 0:
-        summary += " (금리/달러 부담에도 주식 강세)"
-    elif nasdaq_pct < -1 and dxy_pct > 0:
-        summary += " (달러 강세가 성장주 부담 요인)"
-    elif -1 <= nasdaq_pct <= 1 and dxy_pct > 0:
-        summary += " (달러 강세 속 방향성 탐색 구간)"
-    elif -1 <= nasdaq_pct <= 1 and dxy_pct <= 0:
-        summary += " (관망세 속 위험자산 심리 회복 여부 확인)"
-    else:
-        summary += " (위험자산 선호 흐름)"
-
-if summary:
-    st.info(f"📌 글로벌: {summary}")
-
-if kr_summary:
-    st.info(f"🇰🇷 한국: {kr_summary}")
-
 st.subheader("🌍 미국 시장맵")
 st.components.v1.html("""
 <div class="tradingview-widget-container">
