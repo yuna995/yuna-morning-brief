@@ -135,28 +135,57 @@ st.divider()
 
 st.subheader("📝 아침 시황 코멘트")
 
-summary = ""
+lines = []
 
-kr_summary = ""
-kospi_change = market_data.get("KOSPI", (None, None))[1]
-kosdaq_change = market_data.get("KOSDAQ", (None, None))[1]
-# KOSPI
-if kospi_change is not None:
-    if kospi_change > 10:
-        kr_summary += "코스피 강세"
-    elif kospi_change < -10:
-        kr_summary += "코스피 약세"
+# 나스닥
+nasdaq_pct = market_data.get("Nasdaq", {}).get("pct")
+if nasdaq_pct is not None:
+    if nasdaq_pct > 1:
+        lines.append("나스닥은 기술주 강세 흐름입니다.")
+    elif nasdaq_pct < -1:
+        lines.append("나스닥은 기술주 약세 흐름입니다.")
     else:
-        kr_summary += "코스피 보합"
+        lines.append("나스닥은 보합권에 가까운 흐름입니다.")
 
-# KOSDAQ
-if kosdaq_change is not None:
-    if kosdaq_change > 5:
-        kr_summary += ", 코스닥 강세"
-    elif kosdaq_change < -5:
-        kr_summary += ", 코스닥 약세"
+# VIX
+vix = market_data.get("VIX", {}).get("close")
+if vix is not None:
+    if vix >= 20:
+        lines.append("VIX는 높은 수준으로 시장 경계심이 있습니다.")
     else:
-        kr_summary += ", 코스닥 보합"
+        lines.append("VIX는 비교적 안정적인 수준입니다.")
+
+# 금리
+bond = market_data.get("미국채10Y", {}).get("close")
+if bond is not None:
+    lines.append(f"미국채 10년물 금리는 {bond:.2f}% 수준입니다.")
+
+# 달러
+dxy_pct = market_data.get("달러인덱스", {}).get("pct")
+if dxy_pct is not None:
+    if dxy_pct > 0:
+        lines.append("달러 강세 흐름이 이어지고 있습니다.")
+    else:
+        lines.append("달러 약세 흐름입니다.")
+
+# 👉 HTML 변환
+html_list = "".join([f"<li>{line}</li>" for line in lines])
+
+st.markdown(f"""
+<div style="
+    background-color:#1f2a44;
+    padding:25px;
+    border-radius:12px;
+    color:white;
+    font-size:18px;
+    line-height:1.8;
+">
+<b>📌 아침 시황 한줄 코멘트</b>
+<ul>
+{html_list}
+</ul>
+</div>
+""", unsafe_allow_html=True)
 
 nasdaq_pct = market_data.get("Nasdaq", {}).get("pct")
 dxy_pct = market_data.get("달러인덱스", {}).get("pct")
