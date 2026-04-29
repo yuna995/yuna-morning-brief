@@ -87,7 +87,7 @@ def get_korea_market():
 
 # ---------------- UI ----------------
 
-st.title("🌅 이유나 PB 모닝브리프")
+st.title("🌅 이유나 PB의 모닝브리프")
 
 st.divider()
 
