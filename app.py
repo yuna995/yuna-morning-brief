@@ -69,8 +69,8 @@ def get_korea_market():
         return value, change
 
     try:
-        kospi_close, kospi_change = get_naver_index("KOSPI")
-        kosdaq_close, kosdaq_change = get_naver_index("KOSDAQ")
+        kospi_close, kospi_change, _ = get_snapshot("^KS11")
+        kosdaq_close, kosdaq_change, _ = get_snapshot("^KQ11")
 
         if kospi_close is None or kosdaq_close is None:
             return {}
