@@ -132,7 +132,28 @@ st.divider()
 
 st.subheader("📝 아침 시황 코멘트")
 
-summary = "📌 "
+summary = ""
+
+kr_summary = ""
+kospi_change = market_data.get("KOSPI", (None, None))[1]
+kosdaq_change = market_data.get("KOSDAQ", (None, None))[1]
+# KOSPI
+if kospi_change is not None:
+    if kospi_change > 10:
+        kr_summary += "코스피 강세"
+    elif kospi_change < -10:
+        kr_summary += "코스피 약세"
+    else:
+        kr_summary += "코스피 보합"
+
+# KOSDAQ
+if kosdaq_change is not None:
+    if kosdaq_change > 5:
+        kr_summary += ", 코스닥 강세"
+    elif kosdaq_change < -5:
+        kr_summary += ", 코스닥 약세"
+    else:
+        kr_summary += ", 코스닥 보합"
 
 nasdaq_pct = market_data.get("Nasdaq", {}).get("pct")
 dxy_pct = market_data.get("달러인덱스", {}).get("pct")
@@ -166,7 +187,11 @@ if nasdaq_pct is not None and dxy_pct is not None:
     else:
         summary += " (위험자산 선호 흐름)"
 
-st.info(summary)
+if summary:
+    st.info(f"📌 글로벌: {summary}")
+
+if kr_summary:
+    st.info(f"🇰🇷 한국: {kr_summary}")
 
 st.subheader("🌍 미국 시장맵")
 st.components.v1.html("""
