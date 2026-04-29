@@ -2,6 +2,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
+from pykrx import stock
 
 st.set_page_config(page_title="yuna의 모닝브리프", layout="wide")
 
@@ -22,6 +23,31 @@ def get_snapshot(ticker):
 
         if hist.empty or len(hist) < 2:
             return None, None, None
+            @st.cache_data(ttl=1800)
+def get_korea_market():
+    try:
+        today = datetime.now().strftime("%Y%m%d")
+        prev = (datetime.now() - timedelta(days=7)).strftime("%Y%m%d")
+
+        kospi = stock.get_index_ohlcv_by_date(prev, today, "1001")
+        kosdaq = stock.get_index_ohlcv_by_date(prev, today, "2001")
+
+        if kospi.empty or kosdaq.empty or len(kospi) < 2 or len(kosdaq) < 2:
+            return {}
+
+        kospi_close = float(kospi["종가"].iloc[-1])
+        kospi_prev = float(kospi["종가"].iloc[-2])
+
+        kosdaq_close = float(kosdaq["종가"].iloc[-1])
+        kosdaq_prev = float(kosdaq["종가"].iloc[-2])
+
+        return {
+            "KOSPI": (kospi_close, kospi_close - kospi_prev),
+            "KOSDAQ": (kosdaq_close, kosdaq_close - kosdaq_prev)
+        }
+
+    except Exception:
+        return {}
 
         close = float(hist["Close"].iloc[-1])
         prev = float(hist["Close"].iloc[-2])
@@ -123,6 +149,21 @@ for i, (name, ticker) in enumerate(TICKERS.items()):
             value=f"{close:,.2f}",
             delta=f"{change:,.2f} ({pct:.2f}%)"
         )
+        # 👉 여기 (for문 끝난 직후, 들여쓰기 없는 상태)
+
+st.divider()
+st.subheader("🇰🇷 한국 시장")
+
+k_cols[i % 2].metric(
+
+k_data = get_korea_market()
+
+for i, (name, (close, change)) in enumerate(k_data.items()):
+    k_cols[i].metric(
+        label=name,
+        value=f"{close:,.2f}",
+        delta=f"{change:,.2f}"
+    )
 
 st.divider()
 
