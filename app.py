@@ -157,6 +157,14 @@ if dxy_pct is not None:
 if nasdaq_pct is not None and dxy_pct is not None:
     if nasdaq_pct > 1 and dxy_pct > 0:
         summary += " (금리/달러 부담에도 주식 강세)"
+    elif nasdaq_pct < -1 and dxy_pct > 0:
+        summary += " (달러 강세가 성장주 부담 요인)"
+    elif -1 <= nasdaq_pct <= 1 and dxy_pct > 0:
+        summary += " (달러 강세 속 방향성 탐색 구간)"
+    elif -1 <= nasdaq_pct <= 1 and dxy_pct <= 0:
+        summary += " (관망세 속 위험자산 심리 회복 여부 확인)"
+    else:
+        summary += " (위험자산 선호 흐름)"
 
 st.info(summary)
 
